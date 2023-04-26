@@ -8,9 +8,10 @@ import androidx.fragment.app.FragmentTransaction;
 import android.os.Bundle;
 
 import com.example.cookmaster.databinding.ActivityMenuBinding;
+import com.example.cookmaster.model.User;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-public class MenuActivity extends AppCompatActivity {
+public class MenuActivity extends BaseActivity {
     private BottomNavigationView bottomNavigationView;
     ActivityMenuBinding binding;
     @Override

@@ -8,9 +8,10 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
+import com.example.cookmaster.model.User;
 
-public class MainActivity extends AppCompatActivity {
+
+public class MainActivity extends BaseActivity  {
     EditText editTextEmail;
     EditText editTextPassword;
     Button buttonLogin;
@@ -18,8 +19,10 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        User user1 = new User();
 
         // Initialisation des éléments de vue
         editTextEmail = findViewById(R.id.editTextEmail);
