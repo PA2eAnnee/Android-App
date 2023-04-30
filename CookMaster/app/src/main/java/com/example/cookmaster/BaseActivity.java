@@ -2,17 +2,17 @@ package com.example.cookmaster;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.cookmaster.model.User;
+import com.example.cookmaster.model.Users;
 
 public class BaseActivity extends AppCompatActivity {
-    protected User user;
+    protected Users users;
 
-    public User getUser() {
-        return user;
+    public Users getUser() {
+        return users;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setUser(Users users) {
+        this.users = users;
     }
 }
 

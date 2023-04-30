@@ -1,6 +1,5 @@
 package com.example.cookmaster;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -8,7 +7,6 @@ import androidx.fragment.app.FragmentTransaction;
 import android.os.Bundle;
 
 import com.example.cookmaster.databinding.ActivityMenuBinding;
-import com.example.cookmaster.model.User;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MenuActivity extends BaseActivity {

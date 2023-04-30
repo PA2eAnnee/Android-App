@@ -2,13 +2,29 @@ package com.example.cookmaster;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.cookmaster.model.User;
+
+import com.example.cookmaster.ApiService.ApiClient;
+import com.example.cookmaster.model.LoginRequest;
+import com.example.cookmaster.model.Users;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+
+import org.mindrot.jbcrypt.BCrypt;
+
+import java.io.IOException;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Response;
 
 
 public class MainActivity extends BaseActivity  {
@@ -22,7 +38,6 @@ public class MainActivity extends BaseActivity  {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        User user1 = new User();
 
         // Initialisation des éléments de vue
         editTextEmail = findViewById(R.id.editTextEmail);
@@ -57,12 +72,65 @@ public class MainActivity extends BaseActivity  {
             }
         });
     }
+    private boolean checkLogin(final String email, final String password) {
+        final CountDownLatch latch = new CountDownLatch(1);
+        final AtomicBoolean result = new AtomicBoolean(false);
 
-    private boolean checkLogin(String email, String password) {
-        // Vérification des informations de connexion à l'aide d'une base de données ou d'un service web
-        // Renvoie true si les informations sont correctes, false sinon
-        return true;
+        new Thread(() -> {
+
+            // Construire un objet JSON à partir des données de connexion
+            JsonObject jsonObject = new JsonObject();
+            jsonObject.addProperty("email", email);
+            jsonObject.addProperty("password", password);
+
+            // Convertir l'objet JSON en une chaîne JSON
+            String json = new Gson().toJson(jsonObject);
+
+            ApiClient.Connection connection = ApiClient.getRetrofitInstance().create(ApiClient.Connection.class);
+            Call<ResponseBody> call = connection.login(new Gson().fromJson(json, JsonObject.class));
+            System.out.println(call);
+            try {
+                Response<ResponseBody> response = call.execute();
+                System.out.println(response);
+                if (response.isSuccessful()) {
+                    assert response.body() != null;
+                    String responseBody = response.body().string();
+                    System.out.println(responseBody);// récupérer le corps de la réponse
+                    // Vérifier la réponse de l'API pour confirmer ou infirmer la validité des identifiants de l'utilisateur
+                    result.set(responseBody.contains("name"));
+                } else {
+                    // Afficher le code d'erreur et le message d'erreur dans les logs pour déboguer l'erreur
+                    Log.e("API Error", "Code: " + response.code() + ", Message: " + response.message());
+                    result.set(false);
+                }
+
+            } catch (IOException e) {
+                e.printStackTrace();
+                // Erreur de communication avec le serveur
+                result.set(false);
+            } finally {
+                latch.countDown();
+            }
+        }).start();
+
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        return result.get();
     }
+
+
+
+
+
+
+
+
+
+
 
 
 }
