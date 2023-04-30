@@ -9,11 +9,14 @@ import android.os.Bundle;
 import com.example.cookmaster.databinding.ActivityMenuBinding;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import java.util.Objects;
+
 public class MenuActivity extends BaseActivity {
     private BottomNavigationView bottomNavigationView;
     ActivityMenuBinding binding;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Objects.requireNonNull(getSupportActionBar()).hide();
         super.onCreate(savedInstanceState);
         binding = ActivityMenuBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
