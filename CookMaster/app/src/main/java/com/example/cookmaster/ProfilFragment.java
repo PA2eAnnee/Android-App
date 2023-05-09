@@ -1,5 +1,7 @@
 package com.example.cookmaster;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -7,6 +9,9 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
+
+import java.util.Objects;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -14,6 +19,7 @@ import android.view.ViewGroup;
  * create an instance of this fragment.
  */
 public class ProfilFragment extends Fragment {
+
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -59,6 +65,18 @@ public class ProfilFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_profil, container, false);
+        View view = inflater.inflate(R.layout.fragment_profil, container, false);
+
+        SharedPreferences profil = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        TextView profileNameTextView = view.findViewById(R.id.profile_name);
+        profileNameTextView.setText(profil.getString("name",""));
+        profileNameTextView = view.findViewById(R.id.profile_email);
+        profileNameTextView.setText(profil.getString("email",""));
+        profileNameTextView = view.findViewById(R.id.profile_subscription);
+        profileNameTextView.setText(profil.getString("subscription",""));
+        profileNameTextView = view.findViewById(R.id.profile_role);
+        profileNameTextView.setText(String.valueOf(profil.getInt("role",0)));
+
+        return view;
     }
 }

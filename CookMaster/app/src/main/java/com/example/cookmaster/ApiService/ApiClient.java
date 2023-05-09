@@ -53,6 +53,11 @@ public class ApiClient {
         Call<ResponseBody> login(@Body JsonObject body);
     }
 
+    public interface ConnectionToken {
+        @POST("/connectiontoken")
+
+        Call<ResponseBody> connectoken(@Body JsonObject body);
+    }
 
 
 

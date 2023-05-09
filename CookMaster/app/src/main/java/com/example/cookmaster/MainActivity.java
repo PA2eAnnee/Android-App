@@ -1,6 +1,8 @@
 package com.example.cookmaster;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -11,7 +13,10 @@ import android.widget.Toast;
 
 
 import com.example.cookmaster.ApiService.ApiClient;
+import com.example.cookmaster.model.Connectoken;
 import com.example.cookmaster.model.LoginRequest;
+import com.example.cookmaster.model.Logins;
+import com.example.cookmaster.model.Token;
 import com.example.cookmaster.model.Users;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -47,6 +52,14 @@ public class MainActivity extends BaseActivity  {
         buttonLogin = findViewById(R.id.buttonLogin);
         textViewSignup = findViewById(R.id.textViewSignup);
 
+
+        if(verifToken()){
+            Intent intent = new Intent(MainActivity.this, MenuActivity.class);
+            startActivity(intent);
+            finish();
+        }
+
+
         // Ecouteur de clic sur le bouton de connexion
         buttonLogin.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -75,6 +88,8 @@ public class MainActivity extends BaseActivity  {
         });
     }
     private boolean checkLogin(final String email, final String password) {
+
+
         final CountDownLatch latch = new CountDownLatch(1);
         final AtomicBoolean result = new AtomicBoolean(false);
 
@@ -90,16 +105,64 @@ public class MainActivity extends BaseActivity  {
 
             ApiClient.Connection connection = ApiClient.getRetrofitInstance().create(ApiClient.Connection.class);
             Call<ResponseBody> call = connection.login(new Gson().fromJson(json, JsonObject.class));
-            System.out.println(call);
             try {
                 Response<ResponseBody> response = call.execute();
-                System.out.println(response);
                 if (response.isSuccessful()) {
                     assert response.body() != null;
                     String responseBody = response.body().string();
-                    System.out.println(responseBody);// récupérer le corps de la réponse
+                    Gson gson = new Gson();
+                    Logins login = gson.fromJson(responseBody, Logins.class);// récupérer le corps de la réponse
                     // Vérifier la réponse de l'API pour confirmer ou infirmer la validité des identifiants de l'utilisateur
-                    result.set(responseBody.contains("name"));
+                   if (responseBody.contains("name")){
+                       setLoginStatus(login);
+                       result.set(true);
+                    }
+                } else {
+                    // Afficher le code d'erreur et le message d'erreur dans les logs pour déboguer l'erreur
+                    Log.e("API Error", "Code: " + response.code() + ", Message: " + response.message());
+                    result.set(false);
+                }
+
+            } catch (IOException e) {
+                e.printStackTrace();
+                // Erreur de communication avec le serveur
+                result.set(false);
+            } finally {
+                latch.countDown();
+            }
+        }).start();
+
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        return result.get();
+    }
+
+    private boolean verifToken(){
+        final CountDownLatch latch = new CountDownLatch(1);
+        final AtomicBoolean result = new AtomicBoolean(false);
+
+
+        new Thread(() -> {
+            String token = getApplicationContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE).getString("token", "");
+
+            Connectoken connectoken = new Connectoken(token);
+            String json = new Gson().toJson(connectoken);
+
+            ApiClient.ConnectionToken connectionToken = ApiClient.getRetrofitInstance().create(ApiClient.ConnectionToken.class);
+            Call<ResponseBody> call = connectionToken.connectoken(new Gson().fromJson(json, JsonObject.class));
+            try {
+                Response<ResponseBody> response = call.execute();
+                if (response.isSuccessful()) {
+                    assert response.body() != null;
+                    String responseBody = response.body().string();
+                    // Vérifier la réponse de l'API pour confirmer ou infirmer la validité des identifiants de l'utilisateur
+                    if (!responseBody.contains("error")){
+                        result.set(true);
+                    }
                 } else {
                     // Afficher le code d'erreur et le message d'erreur dans les logs pour déboguer l'erreur
                     Log.e("API Error", "Code: " + response.code() + ", Message: " + response.message());
@@ -126,13 +189,19 @@ public class MainActivity extends BaseActivity  {
 
 
 
-
-
-
-
-
-
-
-
+    private void setLoginStatus(Logins logins) {
+        SharedPreferences.Editor editor = getSharedPreferences("MyPrefs", MODE_PRIVATE).edit();
+        editor.putInt("id", logins.getConnection().getConnection().getId());
+        editor.putString("name", logins.getConnection().getConnection().getName());
+        editor.putString("first_name", logins.getConnection().getConnection().getFirst_name());
+        editor.putString("username", logins.getConnection().getConnection().getUsername());
+        editor.putString("email", logins.getConnection().getConnection().getEmail());
+        editor.putInt("role", logins.getConnection().getConnection().getRole());
+        editor.putString("subscription", logins.getConnection().getConnection().getSubscription());
+        editor.putString("picture", logins.getConnection().getConnection().getPicture());
+        editor.putString("creation_time", logins.getConnection().getConnection().getCreation_time());
+        editor.putString("token", logins.getConnection().getConnection().getToken());
+        editor.apply();
+    }
 
 }
