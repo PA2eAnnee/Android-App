@@ -33,21 +33,6 @@ public class ApiClient {
     }
 
 
-    public interface UserApi<User> {
-
-        @GET("users")
-        Call<User> getUserById(@Body User user);
-
-        @POST("users")
-        Call<User> createUser(@Body User user);
-
-        @PUT("users/{id}")
-        Call<User> updateUser(@Path("id") int userId, @Body User user);
-
-        @DELETE("users/{id}")
-        Call<Void> deleteUser(@Path("id") int userId);
-    }
-
     public interface Connection {
         @POST("/connection")
         Call<ResponseBody> login(@Body JsonObject body);
@@ -58,6 +43,46 @@ public class ApiClient {
 
         Call<ResponseBody> connectoken(@Body JsonObject body);
     }
+
+    public interface GetActivites {
+        @POST("/getevents")
+
+        Call<ResponseBody> allactivities(@Body JsonObject body);
+    }
+
+
+    public interface GetGoActivities {
+        @POST("/getgoestos")
+
+        Call<ResponseBody> goactivites(@Body JsonObject body);
+    }
+
+    public interface GoActivities {
+        @POST("/deletegoestos")
+
+        Call<ResponseBody> deleteActivites(@Body JsonObject body);
+
+        @POST("/goestos")
+
+        Call<ResponseBody> addActivites(@Body JsonObject body);
+
+    }
+
+    public interface Recipe {
+        @POST("/getrecipe")
+
+        Call<ResponseBody> getrecipe(@Body JsonObject body);
+
+    }
+
+    public interface RecipeIngredient {
+        @POST("/getrecipeIngredient")
+
+        Call<ResponseBody> getRecipeIngredient(@Body JsonObject body);
+
+    }
+
+
 
 
 

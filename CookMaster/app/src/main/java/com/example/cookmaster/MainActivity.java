@@ -1,5 +1,6 @@
 package com.example.cookmaster;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -37,8 +38,10 @@ public class MainActivity extends BaseActivity  {
     EditText editTextEmail;
     EditText editTextPassword;
     Button buttonLogin;
+    TextView buttonPassword;
     TextView textViewSignup;
 
+    @SuppressLint({"WrongViewCast", "MissingInflatedId"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -50,6 +53,7 @@ public class MainActivity extends BaseActivity  {
         editTextEmail = findViewById(R.id.editTextEmail);
         editTextPassword = findViewById(R.id.editTextPassword);
         buttonLogin = findViewById(R.id.buttonLogin);
+        buttonPassword= findViewById(R.id.textViewForgotPassword);
         textViewSignup = findViewById(R.id.textViewSignup);
 
 
@@ -76,15 +80,18 @@ public class MainActivity extends BaseActivity  {
                 }
             }
         });
+      // Ecouteur de clic sur le lien de mot de passe oublié
+        buttonPassword.setOnClickListener(view -> {
+            // Redirection vers l'activité de reintialisation de mot de passe
+            Intent intent = new Intent(MainActivity.this, ForgetPasswordActivity.class);
+            startActivity(intent);
+        });
 
         // Ecouteur de clic sur le lien de création de compte
-        textViewSignup.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // Redirection vers l'activité de création de compte
-                Intent intent = new Intent(MainActivity.this, MainActivity.class);
-                startActivity(intent);
-            }
+        textViewSignup.setOnClickListener(view -> {
+            // Redirection vers l'activité de création de compte
+            Intent intent = new Intent(MainActivity.this, InscriptionActivity.class);
+            startActivity(intent);
         });
     }
     private boolean checkLogin(final String email, final String password) {

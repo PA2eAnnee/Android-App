@@ -1,28 +1,28 @@
 package com.example.cookmaster.model;
 
 public class Goesto {
-    private int userId;
-    private int eventId;
+    private int id_user;
+    private int id_event;
 
     public Goesto(int userId, int eventId) {
-        this.userId = userId;
-        this.eventId = eventId;
+        this.id_user = userId;
+        this.id_event = eventId;
     }
 
     public int getUserId() {
-        return userId;
+        return id_user;
     }
 
     public void setUserId(int userId) {
-        this.userId = userId;
+        this.id_user = userId;
     }
 
     public int getEventId() {
-        return eventId;
+        return id_event;
     }
 
     public void setEventId(int eventId) {
-        this.eventId = eventId;
+        this.id_user = eventId;
     }
 }
 

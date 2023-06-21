@@ -2,4 +2,7 @@
     <string name="app_name">CookMaster</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="leave">Quitter</string>
+    <string name="join">Rejoindre</string>
+
 </resources>

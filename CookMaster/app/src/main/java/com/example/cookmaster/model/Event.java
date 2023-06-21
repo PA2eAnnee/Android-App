@@ -1,5 +1,8 @@
 package com.example.cookmaster.model;
 
+import android.annotation.SuppressLint;
+
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Event {
@@ -8,19 +11,25 @@ public class Event {
     private int type;
     private int maxMembers;
     private int price;
-    private Date startDate;
-    private Date endDate;
-    private int siteId;
 
-    public Event(int id, String description, int type, int maxMembers, int price, Date startDate, Date endDate, int siteId) {
+    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    String end_date;
+    String start_date;
+
+    private int id_site;
+
+
+    private int recipe_id;
+
+    public Event(int id, String description, int type, int maxMembers, int price, String startDate, String endDate, int siteId) {
         this.id = id;
         this.description = description;
         this.type = type;
         this.maxMembers = maxMembers;
         this.price = price;
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.siteId = siteId;
+        this.start_date = startDate;
+        this.end_date = endDate;
+        this.id_site = siteId;
     }
 
     // getters and setters
@@ -64,28 +73,36 @@ public class Event {
         this.price = price;
     }
 
-    public Date getStartDate() {
-        return startDate;
+    public String getStartDate() {
+        return start_date;
     }
 
-    public void setStartDate(Date startDate) {
-        this.startDate = startDate;
+    public void setStartDate(String startDate) {
+        this.start_date = startDate;
     }
 
-    public Date getEndDate() {
-        return endDate;
+    public String getEndDate() {
+        return end_date;
     }
 
-    public void setEndDate(Date endDate) {
-        this.endDate = endDate;
+    public void setEndDate(String endDate) {
+        this.end_date = endDate;
     }
 
     public int getSiteId() {
-        return siteId;
+        return id_site;
     }
 
     public void setSiteId(int siteId) {
-        this.siteId = siteId;
+        this.id_site = siteId;
+    }
+
+    public int getRecipe_id() {
+        return recipe_id;
+    }
+
+    public void setRecipe_id(int recipe_id) {
+        this.recipe_id = recipe_id;
     }
 }
 

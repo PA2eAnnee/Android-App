@@ -1,6 +1,7 @@
 package com.example.cookmaster;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
@@ -9,24 +10,17 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
-import java.util.Objects;
+import com.example.cookmaster.MainActivity;
+import com.example.cookmaster.R;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link ProfilFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class ProfilFragment extends Fragment {
 
-
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
 
@@ -34,15 +28,6 @@ public class ProfilFragment extends Fragment {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment ProfilFragment.
-     */
-    // TODO: Rename and change types and number of parameters
     public static ProfilFragment newInstance(String param1, String param2) {
         ProfilFragment fragment = new ProfilFragment();
         Bundle args = new Bundle();
@@ -64,18 +49,30 @@ public class ProfilFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_profil, container, false);
 
         SharedPreferences profil = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         TextView profileNameTextView = view.findViewById(R.id.profile_name);
-        profileNameTextView.setText(profil.getString("name",""));
+        profileNameTextView.setText(profil.getString("name", ""));
         profileNameTextView = view.findViewById(R.id.profile_email);
-        profileNameTextView.setText(profil.getString("email",""));
+        profileNameTextView.setText(profil.getString("email", ""));
         profileNameTextView = view.findViewById(R.id.profile_subscription);
-        profileNameTextView.setText(profil.getString("subscription",""));
+        profileNameTextView.setText(profil.getString("subscription", ""));
         profileNameTextView = view.findViewById(R.id.profile_role);
-        profileNameTextView.setText(String.valueOf(profil.getInt("role",0)));
+        profileNameTextView.setText(String.valueOf(profil.getInt("role", 0)));
+
+        Button logoutButton = view.findViewById(R.id.logout_button);
+        logoutButton.setOnClickListener(v -> {
+            // Supprimer le token dans les SharedPreferences
+            SharedPreferences.Editor editor = profil.edit();
+            editor.remove("token");
+            editor.apply();
+
+            // Rediriger vers l'activity MainActivity
+            Intent intent = new Intent(requireContext(), MainActivity.class);
+            startActivity(intent);
+            requireActivity().finish();
+        });
 
         return view;
     }
