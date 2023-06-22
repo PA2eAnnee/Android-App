@@ -36,7 +36,7 @@ public class MenuActivity extends BaseActivity {
                    replaceFragment(new AcceuilFragment());
                    break;
                case R.id.profil:
-                   replaceFragment(new ProfilFragment());
+                   replaceFragment(new ProfileFragment());
                    break;
            }
 
