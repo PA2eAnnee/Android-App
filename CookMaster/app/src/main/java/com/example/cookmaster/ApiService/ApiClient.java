@@ -14,10 +14,9 @@ import retrofit2.http.*;
 
 public class ApiClient {
 
-    private static final String BASE_URL = "http://dev.anonm.fr/connection/";
+    private static final String BASE_URL = "https://api.cookmaster.best";
 
     private static Retrofit retrofit = null;
-
     public static Retrofit getRetrofitInstance() {
         if (retrofit == null) {
             Gson gson = new GsonBuilder()
@@ -47,38 +46,38 @@ public class ApiClient {
     public interface GetActivites {
         @POST("/getevents")
 
-        Call<ResponseBody> allactivities(@Body JsonObject body);
+        Call<ResponseBody> allactivities(@Body JsonObject body,@Header("Authorization") String headerValue);
     }
 
 
     public interface GetGoActivities {
         @POST("/getgoestos")
 
-        Call<ResponseBody> goactivites(@Body JsonObject body);
+        Call<ResponseBody> goactivites(@Body JsonObject body,@Header("Authorization") String headerValue);
     }
 
     public interface GoActivities {
         @POST("/deletegoestos")
 
-        Call<ResponseBody> deleteActivites(@Body JsonObject body);
+        Call<ResponseBody> deleteActivites(@Body JsonObject body,@Header("Authorization") String headerValue);
 
         @POST("/goestos")
 
-        Call<ResponseBody> addActivites(@Body JsonObject body);
+        Call<ResponseBody> addActivites(@Body JsonObject body,@Header("Authorization") String headerValue);
 
     }
 
     public interface Recipe {
         @POST("/getrecipe")
 
-        Call<ResponseBody> getrecipe(@Body JsonObject body);
+        Call<ResponseBody> getrecipe(@Body JsonObject body,@Header("Authorization") String headerValue);
 
     }
 
     public interface RecipeIngredient {
         @POST("/getrecipeIngredient")
 
-        Call<ResponseBody> getRecipeIngredient(@Body JsonObject body);
+        Call<ResponseBody> getRecipeIngredient(@Body JsonObject body,@Header("Authorization") String headerValue);
 
     }
 

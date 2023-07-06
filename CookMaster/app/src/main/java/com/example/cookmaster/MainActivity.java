@@ -206,7 +206,7 @@ public class MainActivity extends BaseActivity  {
         editor.putString("first_name", logins.getConnection().getConnection().getFirst_name());
         editor.putString("username", logins.getConnection().getConnection().getUsername());
         editor.putString("email", logins.getConnection().getConnection().getEmail());
-        editor.putInt("role", logins.getConnection().getConnection().getRole());
+        editor.putString("role", logins.getConnection().getConnection().getRole());
         editor.putString("subscription", logins.getConnection().getConnection().getSubscription());
         editor.putString("picture", logins.getConnection().getConnection().getPicture());
         editor.putString("creation_time", logins.getConnection().getConnection().getCreation_time());

@@ -56,7 +56,7 @@ public class Logins {
             private String password;
             private String username;
             private String email;
-            private int role;
+            private String role;
             private String subscription;
             private String picture;
             private String creation_time;
@@ -113,11 +113,11 @@ public class Logins {
                 this.email = email;
             }
 
-            public int getRole() {
+            public String getRole() {
                 return role;
             }
 
-            public void setRole(int role) {
+            public void setRole(String role) {
                 this.role = role;
             }
 

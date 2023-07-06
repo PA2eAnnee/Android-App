@@ -79,7 +79,7 @@ public class ProfileFragment extends Fragment {
         profileNameTextView = view.findViewById(R.id.profile_subscription);
         profileNameTextView.setText(profil.getString("subscription", ""));
         profileNameTextView = view.findViewById(R.id.profile_role);
-        profileNameTextView.setText(String.valueOf(profil.getInt("role", 0)));
+        profileNameTextView.setText(String.valueOf(profil.getString("role", "")));
 
         profileImage = view.findViewById(R.id.profile_image);
         profileImage.setOnClickListener(new View.OnClickListener() {

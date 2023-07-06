@@ -75,10 +75,11 @@ public class ActiviteFragment extends Fragment {
 
         new Thread(() -> {
             int id = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE).getInt("id",0);
+            String token = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE).getString("token","");
             ApiClient.GetGoActivities getActivites = ApiClient.getRetrofitInstance().create(ApiClient.GetGoActivities.class);
             JsonObject requestBody2 = new JsonObject();
             requestBody2.addProperty("id_user", id);
-            Call<ResponseBody> call2 = getActivites.goactivites(requestBody2);
+            Call<ResponseBody> call2 = getActivites.goactivites(requestBody2,token);
 
             try {
                 Response<ResponseBody> response2 = call2.execute();
@@ -114,9 +115,10 @@ public class ActiviteFragment extends Fragment {
         AtomicBoolean result2 = new AtomicBoolean(false);
 
         new Thread(() -> {
+            String token = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE).getString("token","");
             ApiClient.GetActivites getAllActivites = ApiClient.getRetrofitInstance().create(ApiClient.GetActivites.class);
             JsonObject requestBody2 = new JsonObject();
-            Call<ResponseBody> call2 = getAllActivites.allactivities(requestBody2);
+            Call<ResponseBody> call2 = getAllActivites.allactivities(requestBody2,token);
 
             try {
                 Response<ResponseBody> response2 = call2.execute();

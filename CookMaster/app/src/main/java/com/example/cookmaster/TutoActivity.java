@@ -34,6 +34,7 @@ import retrofit2.Response;
 
 public class TutoActivity extends AppCompatActivity {
 
+    private Context context;
     private WebView webView;
 
     private Recipe recipe;
@@ -48,7 +49,7 @@ public class TutoActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tuto);
-
+        context = getApplicationContext();
         TextView textView1 = findViewById(R.id.textview1);
         TextView textView2 = findViewById(R.id.textview2);
         TextView textView3 = findViewById(R.id.textview3);
@@ -70,10 +71,11 @@ public class TutoActivity extends AppCompatActivity {
             AtomicBoolean result = new AtomicBoolean(false);
 
             new Thread(() -> {
+                String token = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE).getString("token","");
                 ApiClient.Recipe getRecipe = ApiClient.getRetrofitInstance().create(ApiClient.Recipe.class);
                 JsonObject requestBody2 = new JsonObject();
                 requestBody2.addProperty("id", recipe_id);
-                Call<ResponseBody> call2 = getRecipe.getrecipe(requestBody2);
+                Call<ResponseBody> call2 = getRecipe.getrecipe(requestBody2,token);
 
                 try {
                     Response<ResponseBody> response2 = call2.execute();
@@ -112,10 +114,11 @@ public class TutoActivity extends AppCompatActivity {
             AtomicBoolean result2 = new AtomicBoolean(false);
 
             new Thread(() -> {
+                String token = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE).getString("token","");
                 ApiClient.RecipeIngredient getRecipeIngredient = ApiClient.getRetrofitInstance().create(ApiClient.RecipeIngredient.class);
                 JsonObject requestBody2 = new JsonObject();
                 requestBody2.addProperty("recipeID", recipe_id);
-                Call<ResponseBody> call2 = getRecipeIngredient.getRecipeIngredient(requestBody2);
+                Call<ResponseBody> call2 = getRecipeIngredient.getRecipeIngredient(requestBody2,token);
 
                 try {
                     Response<ResponseBody> response2 = call2.execute();

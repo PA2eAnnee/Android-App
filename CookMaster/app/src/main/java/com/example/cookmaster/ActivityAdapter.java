@@ -1,5 +1,7 @@
 package com.example.cookmaster;
 
+import static androidx.core.content.ContentProviderCompat.requireContext;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
@@ -144,11 +146,12 @@ public class ActivityAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         CountDownLatch latch = new CountDownLatch(1);
 
         new Thread(() -> {
+            String token = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE).getString("token","");
             ApiClient.GoActivities getActivites = ApiClient.getRetrofitInstance().create(ApiClient.GoActivities.class);
             JsonObject requestBody2 = new JsonObject();
             requestBody2.addProperty("id_user", id);
             requestBody2.addProperty("id_event", activity.getId());
-            Call<ResponseBody> call2 = getActivites.addActivites(requestBody2);
+            Call<ResponseBody> call2 = getActivites.addActivites(requestBody2,token);
 
             try {
                 Response<ResponseBody> response2 = call2.execute();
@@ -185,6 +188,7 @@ public class ActivityAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private void seeActivity(Event activity) {
         Intent intent = new Intent(context, TutoActivity.class);
         intent.putExtra("recipe_id", activity.getRecipe_id());
+
         context.startActivity(intent);
     }
 
@@ -201,11 +205,12 @@ public class ActivityAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         CountDownLatch latch = new CountDownLatch(1);
 
         new Thread(() -> {
+            String token = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE).getString("token","");
             ApiClient.GoActivities deleteActivites = ApiClient.getRetrofitInstance().create(ApiClient.GoActivities.class);
             JsonObject requestBody2 = new JsonObject();
             requestBody2.addProperty("id_user", id);
             requestBody2.addProperty("id_event", activity.getId());
-            Call<ResponseBody> call2 = deleteActivites.deleteActivites(requestBody2);
+            Call<ResponseBody> call2 = deleteActivites.deleteActivites(requestBody2,token);
 
             try {
                 Response<ResponseBody> response2 = call2.execute();

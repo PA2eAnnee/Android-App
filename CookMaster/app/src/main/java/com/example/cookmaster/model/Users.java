@@ -9,13 +9,13 @@ public class Users {
     private String password;
     private String username;
     private String email;
-    private int role;
+    private String role;
     private String subscription;
     private String picture;
     private LocalDateTime creationTime;
 
     // Constructor
-    public Users(int id, String name, String firstName, String password, String username, String email, int role, String subscription, String picture, LocalDateTime creationTime) {
+    public Users(int id, String name, String firstName, String password, String username, String email, String role, String subscription, String picture, LocalDateTime creationTime) {
         this.id = id;
         this.name = name;
         this.firstName = firstName;
@@ -78,11 +78,11 @@ public class Users {
         this.email = email;
     }
 
-    public int getRole() {
+    public String getRole() {
         return role;
     }
 
-    public void setRole(int role) {
+    public void setRole(String role) {
         this.role = role;
     }
 
