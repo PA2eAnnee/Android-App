@@ -4,9 +4,13 @@ import android.Manifest;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.nfc.FormatException;
+import android.nfc.NdefMessage;
+import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
 import android.nfc.NfcManager;
 import android.nfc.Tag;
+import android.nfc.tech.Ndef;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -19,6 +23,10 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
+
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
 
 public class AcceuilFragment extends Fragment {
 
@@ -101,11 +109,44 @@ public class AcceuilFragment extends Fragment {
     }
 
     private String readTagData(Tag tag) {
-        // TODO: Implement your NFC tag reading logic here
-        // For example, you can read the tag ID
-        byte[] tagId = tag.getId();
-        return ByteArrayToHexString(tagId);
+        // Vérifier si le tag est compatible avec NDEF
+        Ndef ndef = Ndef.get(tag);
+        if (ndef != null) {
+            try {
+                // Connectez-vous au tag NFC
+                ndef.connect();
+
+                // Lisez les enregistrements NDEF du tag
+                NdefMessage ndefMessage = ndef.getNdefMessage();
+                NdefRecord[] records = ndefMessage.getRecords();
+
+                // Parcourez tous les enregistrements et récupérez le texte
+                for (NdefRecord record : records) {
+                    if (record.getTnf() == NdefRecord.TNF_WELL_KNOWN && Arrays.equals(record.getType(), NdefRecord.RTD_TEXT)) {
+                        byte[] payload = record.getPayload();
+                        String textEncoding = ((payload[0] & 128) == 0) ? "UTF-8" : "UTF-16";
+                        int languageCodeLength = payload[0] & 0063;
+                        String text = new String(payload, languageCodeLength + 1, payload.length - languageCodeLength - 1, textEncoding);
+                        return text;
+                    }
+                }
+            } catch (IOException | FormatException e) {
+                e.printStackTrace();
+            } finally {
+                try {
+                    // Déconnectez-vous du tag NFC
+                    ndef.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        // Si aucune donnée n'a été lue ou si le tag n'est pas au format NDEF,
+        // vous pouvez retourner un texte par défaut ou un message indiquant l'absence de données
+        return "Bravo vous avez gagné un bon de reduction de -5% ( code: cinq ) ";
     }
+
 
     private void showToast(final String message) {
         requireActivity().runOnUiThread(new Runnable() {

@@ -109,9 +109,11 @@ public class MainActivity extends BaseActivity  {
             JsonObject jsonObject = new JsonObject();
             jsonObject.addProperty("email", email);
             jsonObject.addProperty("password", password);
+            jsonObject.addProperty("origin", "phone");
 
             // Convertir l'objet JSON en une chaîne JSON
             String json = new Gson().toJson(jsonObject);
+
 
             ApiClient.Connection connection = ApiClient.getRetrofitInstance().create(ApiClient.Connection.class);
             Call<ResponseBody> call = connection.login(new Gson().fromJson(json, JsonObject.class));

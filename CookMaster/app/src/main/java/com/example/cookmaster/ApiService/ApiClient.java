@@ -1,11 +1,14 @@
 package com.example.cookmaster.ApiService;
 
+import android.graphics.Picture;
+
 import com.example.cookmaster.model.LoginRequest;
 import com.example.cookmaster.model.Users;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 
+import okhttp3.MultipartBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Retrofit;
@@ -81,39 +84,12 @@ public class ApiClient {
 
     }
 
+    public interface SavePicture {
+        @POST("/pictures")
 
+        Call<ResponseBody> savepicture(@Header("Authorization") String headerValue, @Part MultipartBody.Part photo );
 
-
-
-
-
-
-
-    public interface SiteApi {
-        // Ajoutez ici les méthodes d'appel API pour la table Site
     }
 
-    public interface ArticleApi {
-        // Ajoutez ici les méthodes d'appel API pour la table Articles
-    }
 
-    public interface SpaceApi {
-        // Ajoutez ici les méthodes d'appel API pour la table Space
-    }
-
-    public interface EventApi {
-        // Ajoutez ici les méthodes d'appel API pour la table Event
-    }
-
-    public interface GoesToApi {
-        // Ajoutez ici les méthodes d'appel API pour la table GoesTo
-    }
-
-    public interface ContainsApi {
-        // Ajoutez ici les méthodes d'appel API pour la table Contains
-    }
-
-    public interface BooksApi {
-        // Ajoutez ici les méthodes d'appel API pour la table Books
-    }
 }

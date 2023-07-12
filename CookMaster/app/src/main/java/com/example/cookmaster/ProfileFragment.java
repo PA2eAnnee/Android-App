@@ -13,8 +13,9 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
-import android.util.Log;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,10 +24,17 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 public class ProfileFragment extends Fragment {
 
@@ -39,7 +47,10 @@ public class ProfileFragment extends Fragment {
     private String mParam2;
     private ImageView profileImage;
     private ProgressDialog progressDialog;
+
+    String token;
     private Bitmap selectedBitmap;
+    private String currentPhotoPath;
 
     public ProfileFragment() {
         // Required empty public constructor
@@ -89,6 +100,14 @@ public class ProfileFragment extends Fragment {
             }
         });
 
+        // Afficher l'image à partir des SharedPreferences
+        String encodedImage = profil.getString("profileImage", null);
+        if (encodedImage != null) {
+            byte[] decodedBytes = Base64.decode(encodedImage, Base64.DEFAULT);
+            Bitmap decodedBitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
+            profileImage.setImageBitmap(decodedBitmap);
+        }
+
         Button logoutButton = view.findViewById(R.id.logout_button);
         logoutButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -128,11 +147,26 @@ public class ProfileFragment extends Fragment {
     }
 
     private void openCamera() {
-        if (requireContext().checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
             Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            startActivityForResult(intent, REQUEST_CAMERA);
+            if (intent.resolveActivity(requireActivity().getPackageManager()) != null) {
+                File photoFile;
+                try {
+                    photoFile = createImageFile();
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                    return;
+                }
+                if (photoFile != null) {
+                    Uri photoUri = FileProvider.getUriForFile(requireContext(),
+                            "com.example.cookmaster.fileprovider",
+                            photoFile);
+                    intent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri);
+                    startActivityForResult(intent, REQUEST_CAMERA);
+                }
+            }
         } else {
-            requestPermissions(new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA);
+            ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA);
         }
     }
 
@@ -141,8 +175,22 @@ public class ProfileFragment extends Fragment {
         startActivityForResult(intent, REQUEST_GALLERY);
     }
 
+    private File createImageFile() throws IOException {
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = requireActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File imageFile = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+        currentPhotoPath = imageFile.getAbsolutePath();
+        return imageFile;
+    }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == REQUEST_CAMERA) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 openCamera();
@@ -155,16 +203,19 @@ public class ProfileFragment extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == getActivity().RESULT_OK) {
             if (requestCode == REQUEST_CAMERA) {
-                Bundle extras = data.getExtras();
-                if (extras != null && extras.containsKey("data")) {
-                    selectedBitmap = (Bitmap) extras.get("data");
-                    showConfirmDialog();
+                // Capture image from camera
+                if (currentPhotoPath != null) {
+                    selectedBitmap = BitmapFactory.decodeFile(currentPhotoPath);
+                    profileImage.setImageBitmap(selectedBitmap);
+                    saveProfileImage(selectedBitmap);
                 }
             } else if (requestCode == REQUEST_GALLERY && data != null && data.getData() != null) {
+                // Select image from gallery
                 Uri imageUri = data.getData();
                 try {
                     selectedBitmap = MediaStore.Images.Media.getBitmap(requireContext().getContentResolver(), imageUri);
                     profileImage.setImageBitmap(selectedBitmap);
+                    saveProfileImage(selectedBitmap);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -172,29 +223,17 @@ public class ProfileFragment extends Fragment {
         }
     }
 
-    private void showConfirmDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-        builder.setTitle("Confirmer la photo")
-                .setMessage("Voulez-vous utiliser cette photo comme photo de profil ?")
-                .setPositiveButton("Confirmer", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        // Mettre à jour l'image de profil avec la nouvelle photo
-                        profileImage.setImageBitmap(selectedBitmap);
-                    }
-                })
-                .setNegativeButton("Annuler", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        // Ne rien faire, annuler le choix de la photo
-                    }
-                });
+    private void saveProfileImage(Bitmap bitmap) {
+        if (bitmap != null) {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
+            byte[] imageBytes = baos.toByteArray();
+            String encodedImage = Base64.encodeToString(imageBytes, Base64.DEFAULT);
 
-        // Afficher la photo capturée dans le message de la boîte de dialogue
-        ImageView imageView = new ImageView(requireContext());
-        imageView.setImageBitmap(selectedBitmap);
-        builder.setView(imageView);
-
-        builder.show();
+            SharedPreferences profil = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = profil.edit();
+            editor.putString("profileImage", encodedImage);
+            editor.apply(); // Utilisez commit() au lieu de apply() pour s'assurer que les modifications sont enregistrées immédiatement.
+        }
     }
 }

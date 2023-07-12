@@ -7,14 +7,18 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.example.cookmaster.ApiService.ApiClient;
 import com.example.cookmaster.model.Event;
 import com.example.cookmaster.model.Goesto;
+import com.example.cookmaster.model.IngredientAdapter;
+import com.example.cookmaster.model.Ingredients;
 import com.example.cookmaster.model.Logins;
 import com.example.cookmaster.model.Recipe;
 import com.example.cookmaster.model.RecipeIngredient;
@@ -42,11 +46,13 @@ public class TutoActivity extends AppCompatActivity {
 
 
 
-    public ArrayList<RecipeIngredient> recipeIngredient = new ArrayList<>();
+    public ArrayList<Ingredients> recipeIngredient = new ArrayList<>();
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tuto);
         context = getApplicationContext();
@@ -54,18 +60,24 @@ public class TutoActivity extends AppCompatActivity {
         TextView textView2 = findViewById(R.id.textview2);
         TextView textView3 = findViewById(R.id.textview3);
 
+        ListView listView = findViewById(R.id.listView);
+        IngredientAdapter adapter = new IngredientAdapter(this, recipeIngredient);
+        listView.setAdapter(adapter);
+
+
         Intent intent = getIntent();
         int recipe_id = intent.getIntExtra("recipe_id",0);
 
         webView = findViewById(R.id.webview);
         webView.getSettings().setJavaScriptEnabled(true);
         webView.setWebChromeClient(new WebChromeClient());
-        String videoId = "UDiPKGxCGo0"; // Identifiant de la vidéo YouTube
+        String videoId = "kqVzOjfRZPk "; // Identifiant de la vidéo YouTube
         String videoUrl = "https://www.youtube.com/embed/" + videoId;
         String html = "<iframe width=\"100%\" height=\"100%\" src=\"" + videoUrl + "\" frameborder=\"0\" allowfullscreen></iframe>";
         webView.loadData(html, "text/html", "utf-8");
 
         if(recipe_id != 0 ){
+            System.out.println(recipe_id);
 
             CountDownLatch latch = new CountDownLatch(1);
             AtomicBoolean result = new AtomicBoolean(false);
@@ -117,7 +129,7 @@ public class TutoActivity extends AppCompatActivity {
                 String token = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE).getString("token","");
                 ApiClient.RecipeIngredient getRecipeIngredient = ApiClient.getRetrofitInstance().create(ApiClient.RecipeIngredient.class);
                 JsonObject requestBody2 = new JsonObject();
-                requestBody2.addProperty("recipeID", recipe_id);
+                requestBody2.addProperty("recipeid", recipe_id);
                 Call<ResponseBody> call2 = getRecipeIngredient.getRecipeIngredient(requestBody2,token);
 
                 try {
@@ -128,7 +140,7 @@ public class TutoActivity extends AppCompatActivity {
                         Gson gson = new Gson();
                         JsonObject jsonObject = gson.fromJson(responseString, JsonObject.class);
                         if (jsonObject.has("recipeIngredients")) {
-                            recipeIngredient.addAll(gson.fromJson(jsonObject.get("recipeIngredients"), new TypeToken<ArrayList<RecipeIngredient>>() {}.getType()));
+                            recipeIngredient.addAll(gson.fromJson(jsonObject.get("recipeIngredients"), new TypeToken<ArrayList<Ingredients>>() {}.getType()));
                             result2.set(true);
                         }
                     } else {
@@ -148,14 +160,24 @@ public class TutoActivity extends AppCompatActivity {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            System.out.println(recipe.getID());
-            System.out.println(recipe.getDescription());
-            textView1.setText(recipe.getDescription());
-            textView2.setText(String.valueOf(recipe.getDuration()));
-            textView3.setText(recipe.getComplexityLevel());
 
-            System.out.println(recipeIngredient.get(0).getIngredientID());
+            if(recipeIngredient.size()  > 0 ){
+                textView1.setText(recipe.getDescription());
+                textView2.setText("Durée en MN : "+ recipe.getDuration());
+                textView3.setText("Difficulté : "+ recipe.getComplexityLevel());
+            }else {
+                textView1.setText("Recette indisponible pour ce WorkShop");
+                textView2.setVisibility(View.INVISIBLE);
+                textView3.setVisibility(View.INVISIBLE);
+            }
+
+
+        }else {
+            textView1.setText("Recette indisponible pour ce WorkShop");
+            textView2.setVisibility(View.INVISIBLE);
+            textView3.setVisibility(View.INVISIBLE);
         }
+
 
 
 
